@@ -72,17 +72,18 @@ function closeOnOverlay(e){
 document.addEventListener('keydown', e => { if(e.key==='Escape') closeModal(); });
 
 /* â”€â”€ SUBMIT â”€â”€ */
-function submitForm(){
+async function submitForm(){
   const name    = document.getElementById('name').value.trim();
   const mobile  = document.getElementById('mobile').value.trim();
   const enquiry = document.getElementById('enquiry').value;
   const message = document.getElementById('message').value.trim();
+  const submitBtn = document.querySelector('#formView .submit-btn');
 
   if(!name)    { alert('Please enter your name.'); return; }
   if(!mobile)  { alert('Please enter your mobile number.'); return; }
   if(!enquiry) { alert('Please select an enquiry type.'); return; }
 
-  /* Build HTML table for email body (mailto fallback) */
+  /* Build HTML table preview shown in success modal */
   const table = `
   <table border="1" cellpadding="10" cellspacing="0" style="border-collapse:collapse;width:100%;font-family:sans-serif;">
     <thead style="background:#2d6a4f;color:#fff;">
@@ -100,12 +101,43 @@ function submitForm(){
   /* Show summary in modal */
   document.getElementById('summaryTable').innerHTML = table.replace(/<table/,'<table style="font-size:.8rem"');
 
-  /* Open mailto (replace with actual backend / EmailJS as needed) */
-  const subject = encodeURIComponent(`New Enquiry from ${name} - ${enquiry}`);
-  const body    = encodeURIComponent(
-    `New Enquiry Received\n\nName: ${name}\nMobile: ${mobile}\nEnquiry Type: ${enquiry}\nMessage: ${message || '-'}\nDate: ${new Date().toLocaleString('en-IN')}`
-  );
-  window.location.href = `mailto:contact@shetkariirrigation.com?subject=${subject}&body=${body}`;
+  const payload = {
+    _subject: `New Enquiry from ${name} - ${enquiry}`,
+    _template: 'table',
+    _captcha: 'false',
+    name,
+    mobile,
+    enquiry_type: enquiry,
+    message: message || '-',
+    submitted_at: new Date().toLocaleString('en-IN')
+  };
+
+  if (submitBtn) {
+    submitBtn.disabled = true;
+    submitBtn.textContent = 'Submitting...';
+  }
+
+  try {
+    const response = await fetch('https://formsubmit.co/ajax/contact@shetkariirrigation.com', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json'
+      },
+      body: JSON.stringify(payload)
+    });
+    const result = await response.json().catch(() => ({}));
+    if (!response.ok || result.success === 'false') {
+      throw new Error(result.message || 'Unable to submit enquiry right now.');
+    }
+  } catch (error) {
+    alert(error.message || 'Submission failed. Please try again.');
+    if (submitBtn) {
+      submitBtn.disabled = false;
+      submitBtn.textContent = 'Submit Enquiry →';
+    }
+    return;
+  }
 
   /* Show success */
   document.getElementById('formView').style.display  = 'none';
