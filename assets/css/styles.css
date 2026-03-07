@@ -64,7 +64,7 @@
     }
     nav ul { 
       display: flex; position: fixed; top: 72px; left: 0; right: 0;
-      height: calc(40dvh - 72px);
+      height: calc(50dvh - 72px);
       flex-direction: column; align-items: flex-start; justify-content: flex-start; 
       gap: 0; padding: 1.5rem 5% 2rem; z-index: 1002;
       background: rgba(26,74,46,.99); backdrop-filter: blur(10px);
@@ -93,7 +93,7 @@
     }
     nav .logo img { height: 40px; }
     nav ul {
-      top: 60px; height: calc(40dvh - 60px); padding: 1.2rem 4%;
+      top: 60px; height: calc(50dvh - 60px); padding: 1.2rem 4%;
     }
     .hamburger { padding: 6px; }
     .hamburger span { width: 22px; height: 2.5px; }

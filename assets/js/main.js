@@ -114,8 +114,4 @@ function submitForm(){
   /* Reset */
   ['name','mobile','message'].forEach(id => document.getElementById(id).value = '');
   document.getElementById('enquiry').selectedIndex = 0;
-<<<<<<< HEAD
 }
-=======
-}
->>>>>>> master
